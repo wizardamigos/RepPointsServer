@@ -1,0 +1,25 @@
+{
+    "users": [
+        {
+            "name": "alex",
+            "points": 22
+        },
+        {
+            "name": "nina",
+            "points": 22
+        },
+        {
+            "name": "alexej",
+            "points": 22
+        },
+        {
+            "name": "kuba",
+            "points": 22
+        },
+        {
+            "name": "jannis",
+            "points": 22
+        }
+    ],
+    "timestamp": 1447163833642
+}
