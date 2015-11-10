@@ -4,44 +4,59 @@ var git    = require('gitty');
 
 var Engine = function(){
 
-var _this = this;
+  var _this = this;
 
-var dis_snap_path = "data/dis_snapshot.json";
-var rules_path = "data/rules.json";
-var myRepo = git('.');
+  var dis_snap_path = "data/dis_snapshot.json";
+  var rules_path = "data/rules.json";
+  var myRepo = git('.');
+  var creds = null;
 
-var dis_snapshot, rules;
+  var dis_snapshot, rules;
 
-var event_queue = async.queue(function(task, callback){
-  task(function(){callback();});
-});
+  var event_queue = async.queue(function(task, callback){
+    task(function(){callback();});
+  });
 
-var redistribute_timer_id;
-var creation_timer_id;
+  var redistribute_timer_id;
+  var creation_timer_id;
 
-this.start = function(){
-  async.series([
-    function(cb){
-      _this.loadData(cb);
-    },
-    function(cb){
+  this.start = function(){
+    async.series([
+      function(cb){
+        _this.gitInit();
+      },
+      function(cb){
+        _this.loadData(cb);
+      },
+      function(cb){
 
-      redistribute_timer_id = setInterval(function(){
-        event_queue.push(_this.redistribute);
-      }, rules.redistribution_interval);
+        redistribute_timer_id = setInterval(function(){
+          event_queue.push(_this.redistribute);
+        }, rules.redistribution_interval);
 
-      creation_timer_id = setInterval(function(){
-        event_queue.push(_this.createPoints);
-      }, rules.creation_interval);
+        creation_timer_id = setInterval(function(){
+          event_queue.push(_this.createPoints);
+        }, rules.creation_interval);
 
-      cb();
+        cb();
+      }
+
+    ]);
+  }
+
+  this.gitInit = function(){
+    if(process.env.GITHUB_USERNAME && process.env.GITHUB_PW){
+      creds = {username: process.env.GITHUB_USERNAME, password: process.env.GITHUB_PW};
     }
 
-  ]);
-}
+    if(!fs.existsSync('.git')){
+      myRepo.initSync();
+      myRepo.addRemoteSync('origin', 'https://github.com/wizardamigosinstitute/RepPointsServer');
+    }
+  }
 
   this.loadData = function(cb){
-      myRepo.pull('origin', 'master', function(err){
+      myRepo.pull('origin', 'master', creds, function(err){
         if(err) return console.log(err);
 
         dis_snapshot = JSON.parse(fs.readFileSync(dis_snap_path, 'utf8'));
@@ -65,7 +80,7 @@ this.start = function(){
     myRepo.commitSync(message);
 
     //push
-    myRepo.push('origin', 'master', function(err){
+    myRepo.push('origin', 'master', creds, function(err){
       if(err) return console.log(err);
 
       console.log("pushed to remote");
