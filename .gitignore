@@ -29,3 +29,7 @@ node_modules
 
 # Optional npm cache directory
 .npm
+
+# heroku
+.heroku/
+.profile.d/
