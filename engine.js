@@ -11,7 +11,7 @@ var Engine = function(){
   var rules_path = "data/rules.json";
   var myRepo = git('.');
   var creds = null;
-  var url = 'https://github.com/wizardamigosinstitute/RepPointsServer';
+  var url = 'github.com/wizardamigosinstitute/RepPointsServer';
 
   var dis_snapshot, rules;
 
@@ -56,7 +56,7 @@ var Engine = function(){
       }
 
       myRepo.initSync();
-      myRepo.addRemoteSync('origin', url);
+      myRepo.addRemoteSync('origin', 'https://' + url);
 
       execSync('git config --global user.email ' + process.env.GITHUB_USERNAME);
       execSync('git config --global user.name ' + process.env.GITHUB_USERNAME);
@@ -97,7 +97,7 @@ var Engine = function(){
 
     //push
     execSync('git push --repo https://' + process.env.GITHUB_USERNAME +
-            ':' + process.env.GITHUB_PW + '@' + url);
+            ':' + process.env.GITHUB_PW + '@' + url + ' master');
 
     console.log("pushed to remote");
 
