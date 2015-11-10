@@ -10,8 +10,7 @@ var Engine = function(){
   var dis_snap_path = "data/dis_snapshot.json";
   var rules_path = "data/rules.json";
   var myRepo = git('.');
-  var creds = null;
-  var url = 'github.com/wizardamigosinstitute/RepPointsServer';
+  var url = 'https://github.com/wizardamigosinstitute/RepPointsServer';
 
   var dis_snapshot, rules;
 
@@ -51,15 +50,13 @@ var Engine = function(){
 
       console.log('initializing git');
 
-      if(process.env.GITHUB_USERNAME && process.env.GITHUB_PW){
-        creds = {username: process.env.GITHUB_USERNAME, password: process.env.GITHUB_PW};
-      }
-
       myRepo.initSync();
-      myRepo.addRemoteSync('origin', 'https://' + url);
+      myRepo.addRemoteSync('origin', url);
 
       execSync('git config --global user.email ' + process.env.GITHUB_USERNAME);
       execSync('git config --global user.name ' + process.env.GITHUB_USERNAME);
+
+      execSync('git config credential.helper store');
 
       myRepo.addSync(['-A']);
       myRepo.commitSync('git init from heroku');
@@ -96,8 +93,7 @@ var Engine = function(){
     myRepo.commitSync(message);
 
     //push
-    execSync('git push --repo https://' + process.env.GITHUB_USERNAME +
-            ':' + process.env.GITHUB_PW + '@' + url + ' master');
+    execSync('git push --all --repo=' + url);
 
     console.log("pushed to remote");
 
