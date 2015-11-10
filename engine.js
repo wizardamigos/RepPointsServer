@@ -46,12 +46,15 @@ var Engine = function(){
   }
 
   this.gitInit = function(){
-    var url = 'https://github.com/wizardamigosinstitute/RepPointsServer';
-    if(process.env.GITHUB_USERNAME && process.env.GITHUB_PW){
-      creds = {username: process.env.GITHUB_USERNAME, password: process.env.GITHUB_PW};
-    }
-
     if(!fs.existsSync('.git')){
+
+      console.log('initializing git');
+
+      var url = 'https://github.com/wizardamigosinstitute/RepPointsServer';
+      if(process.env.GITHUB_USERNAME && process.env.GITHUB_PW){
+        creds = {username: process.env.GITHUB_USERNAME, password: process.env.GITHUB_PW};
+      }
+
       myRepo.initSync();
       myRepo.addRemoteSync('origin', url);
 
