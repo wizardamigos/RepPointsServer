@@ -2,5 +2,5 @@
   "redistribution_rate" : 0.5,
   "redistribution_interval" : 86400000,
   "creation_rate" : 10,
-  "creation_interval" : 604800000
+  "creation_interval" : 20000
 }
