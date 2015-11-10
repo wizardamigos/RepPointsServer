@@ -1,6 +1,7 @@
 var fs = require("fs");
 var async = require("async");
 var git    = require('gitty');
+var execSync = require('child_process').execSync;
 
 var Engine = function(){
 
@@ -45,13 +46,17 @@ var Engine = function(){
   }
 
   this.gitInit = function(){
+    var url = 'https://github.com/wizardamigosinstitute/RepPointsServer';
     if(process.env.GITHUB_USERNAME && process.env.GITHUB_PW){
       creds = {username: process.env.GITHUB_USERNAME, password: process.env.GITHUB_PW};
     }
 
     if(!fs.existsSync('.git')){
       myRepo.initSync();
-      myRepo.addRemoteSync('origin', 'https://github.com/wizardamigosinstitute/RepPointsServer');
+      myRepo.addRemoteSync('origin', url);
+
+      execSync('git config --global user.email ' + process.env.GITHUB_USERNAME);
+      execSync('git config --global user.name ' + process.env.GITHUB_USERNAME);
     }
   }
 
