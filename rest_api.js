@@ -7,8 +7,7 @@
 var express    = require('express');        // call express
 var app        = express();                 // define our app using express
 var bodyParser = require('body-parser');
-var github = require('github');
-var engine = require('./engine');
+var Engine = require('./engine');
 
 // configure app to use bodyParser()
 // this will let us get the data from a POST
@@ -17,7 +16,7 @@ app.use(bodyParser.json());
 
 var port = process.env.PORT || 8080;        // set our port
 
-engine = new engine();
+engine = new Engine();
 engine.start();
 
 // START THE SERVER

@@ -1,6 +1,6 @@
 {
   "redistribution_rate" : 0.1,
-  "redistribution_interval" : 6000,
+  "redistribution_interval" : 20000,
   "creation_rate" : 10,
-  "creation_interval" : 6000
+  "creation_interval" : 10000
 }
