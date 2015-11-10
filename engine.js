@@ -12,23 +12,33 @@ var myRepo = git('.');
 
 var dis_snapshot, rules;
 
+var event_queue = async.queue(function(task, callback){
+  task(function(){callback();});
+});
+
 var redistribute_timer_id;
 var creation_timer_id;
 
 this.start = function(){
-  var self = this;
-    async.series([
-      function(cb){
-        _this.loadData(cb);
-      },
-      function(cb){
-        //start timers
-        redistribute_timer_id = setInterval(_this.redistribute, rules.redistribution_interval);
-        creation_timer_id = setInterval(_this.createPoints, rules.creation_interval);
-        cb();
-      }
-    ]);
-  }
+  async.series([
+    function(cb){
+      _this.loadData(cb);
+    },
+    function(cb){
+
+      redistribute_timer_id = setInterval(function(){
+        event_queue.push(_this.redistribute);
+      }, rules.redistribution_interval);
+
+      creation_timer_id = setInterval(function(){
+        event_queue.push(_this.createPoints);
+      }, rules.creation_interval);
+
+      cb();
+    }
+
+  ]);
+}
 
   this.loadData = function(cb){
       myRepo.pull('origin', 'master', function(err){
@@ -52,9 +62,7 @@ this.start = function(){
     myRepo.addSync([dis_snap_path]);
 
     //commit
-    myRepo.commit(message, function(err){
-      if(err) return console.log(err);
-    });
+    myRepo.commitSync(message);
 
     //push
     myRepo.push('origin', 'master', function(err){
@@ -66,7 +74,7 @@ this.start = function(){
     });
   }
 
-  this.redistribute = function(){
+  this.redistribute = function(queue_callback){
     console.log("redistribute started");
 
     async.series([
@@ -79,11 +87,15 @@ this.start = function(){
       },
       function(cb){
         _this.saveData("redistribution by RepPointsServer", cb);
+      },
+      function(cb){
+        queue_callback();
+        cb();
       }
     ]);
   }
 
-  this.createPoints = function(){
+  this.createPoints = function(queue_callback){
     console.log("create points started");
 
     async.series([
@@ -96,6 +108,10 @@ this.start = function(){
       },
       function(cb){
         _this.saveData("points created by RepPointsServer", cb);
+      },
+      function(cb){
+        queue_callback();
+        cb();
       }
     ]);
   }
