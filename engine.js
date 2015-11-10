@@ -64,8 +64,8 @@ var Engine = function(){
       myRepo.addSync(['-A']);
       myRepo.commitSync('git init from heroku');
 
-      cb();
     }
+    cb();
   }
 
   this.loadData = function(cb){
