@@ -11,6 +11,7 @@ var Engine = function(){
   var rules_path = "data/rules.json";
   var myRepo = git('.');
   var creds = null;
+  var url = 'https://github.com/wizardamigosinstitute/RepPointsServer';
 
   var dis_snapshot, rules;
 
@@ -50,7 +51,6 @@ var Engine = function(){
 
       console.log('initializing git');
 
-      var url = 'https://github.com/wizardamigosinstitute/RepPointsServer';
       if(process.env.GITHUB_USERNAME && process.env.GITHUB_PW){
         creds = {username: process.env.GITHUB_USERNAME, password: process.env.GITHUB_PW};
       }
@@ -96,13 +96,12 @@ var Engine = function(){
     myRepo.commitSync(message);
 
     //push
-    myRepo.push('origin', 'master', creds, function(err){
-      if(err) return console.log(err);
+    execSync('git push --repo https://' + process.env.GITHUB_USERNAME +
+            ':' + process.env.GITHUB_PW + '@' + url);
 
-      console.log("pushed to remote");
+    console.log("pushed to remote");
 
-      if(cb !== undefined) cb();
-    });
+    if(cb !== undefined) cb();
   }
 
   this.redistribute = function(queue_callback){
