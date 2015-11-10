@@ -57,12 +57,18 @@ var Engine = function(){
 
       execSync('git config --global user.email ' + process.env.GITHUB_USERNAME);
       execSync('git config --global user.name ' + process.env.GITHUB_USERNAME);
+
+      myRepo.addSync(['-A']);
+      myRepo.commitSync('git init from heroku');
     }
   }
 
   this.loadData = function(cb){
-      myRepo.pull('origin', 'master', creds, function(err){
+    console.log("--> git pull origin master");
+      myRepo.pull('origin', 'master', function(err){
         if(err) return console.log(err);
+
+        console.log('--> git pull successful!');
 
         dis_snapshot = JSON.parse(fs.readFileSync(dis_snap_path, 'utf8'));
         console.log("read dis_snapshot");
