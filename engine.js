@@ -24,7 +24,7 @@ var Engine = function(){
   this.start = function(){
     async.series([
       function(cb){
-        _this.gitInit();
+        _this.gitInit(cb);
       },
       function(cb){
         _this.loadData(cb);
@@ -45,7 +45,7 @@ var Engine = function(){
     ]);
   }
 
-  this.gitInit = function(){
+  this.gitInit = function(cb){
     if(!fs.existsSync('.git')){
 
       console.log('initializing git');
@@ -63,6 +63,8 @@ var Engine = function(){
 
       myRepo.addSync(['-A']);
       myRepo.commitSync('git init from heroku');
+
+      cb();
     }
   }
 
