@@ -4,3 +4,8 @@
 
 
 Server that does the distribution of reputation points
+
+# REST API
+
+*Transfer points*
+`http://your.server.address:port/transferPoints?fromUserId=<userId>&toUserId=<userId>&amount=<int>`
