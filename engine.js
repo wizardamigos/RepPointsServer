@@ -15,8 +15,16 @@ var Engine = function(){
   var dis_snapshot, rules;
 
   var event_queue = async.queue(function(task, callback){
-    task(function(){callback();});
+    _this.eventWrapper(task.fn, task.args, task.message, callback);
   });
+
+  this.enqueueTask = function(_fn, _args, _message){
+    event_queue.push({
+      fn: _fn,
+      args: _args,
+      message: _message
+    });
+  }
 
   var redistribute_timer_id;
   var creation_timer_id;
@@ -32,11 +40,11 @@ var Engine = function(){
       function(cb){
 
         redistribute_timer_id = setInterval(function(){
-          event_queue.push(_this.redistribute);
+          _this.enqueueTask(_this.performRedistribution, [], "redistribution of points by RepPointsServer");
         }, rules.redistribution_interval);
 
         creation_timer_id = setInterval(function(){
-          event_queue.push(_this.createPoints);
+          _this.enqueueTask(_this.performCreatePoints, [], "points created by RepPointsServer");
         }, rules.creation_interval);
 
         cb();
@@ -100,44 +108,23 @@ var Engine = function(){
     if(cb !== undefined) cb();
   }
 
-  this.redistribute = function(queue_callback){
-    console.log("redistribute started");
+  this.eventWrapper = function(fn, args, message, queue_callback){
+    console.log("performing '" + message + "'");
 
     async.series([
       function(cb){
         _this.loadData(cb);
       },
       function(cb){
-        _this.performRedistribution();
+        fn.apply(null, args);
         cb();
       },
       function(cb){
-        _this.saveData("redistribution by RepPointsServer", cb);
+        _this.saveData(message, cb);
       },
       function(cb){
+        cb();
         queue_callback();
-        cb();
-      }
-    ]);
-  }
-
-  this.createPoints = function(queue_callback){
-    console.log("create points started");
-
-    async.series([
-      function(cb){
-        _this.loadData(cb);
-      },
-      function(cb){
-        _this.performCreatePoints();
-        cb();
-      },
-      function(cb){
-        _this.saveData("points created by RepPointsServer", cb);
-      },
-      function(cb){
-        queue_callback();
-        cb();
       }
     ]);
   }
@@ -164,6 +151,43 @@ var Engine = function(){
     });
 
     dis_snapshot.timestamp = Date.now();
+  }
+
+  /**
+* Transfers reputation points from user A to user B
+* if balance of A is sufficient
+* #transferPoints
+* @param {String} fromUserId
+* @param {String} toUserId
+* @param {int} amount
+*/
+  this.transferPoints = function(fromUserId, toUserId, amount){
+      var valid = false;
+      var users = dis_snapshot.users;
+
+      for(var i = 0 ; i < users.length ; i++){
+        if(users[i].name === fromUserId){
+          console.log("fromUser found");
+          if(users[i].points >= amount){
+            console.log("withdrawal successful");
+            users[i].points -= amount;
+            valid = true;
+          }
+          break;
+        }
+      }
+
+      if(valid){
+        for(var i = 0 ; i < users.length ; i++){
+          if(users[i].name == toUserId){
+            console.log("toUser found");
+            users[i].points = parseInt(users[i].points) + parseInt(amount);
+            break;
+          }
+        }
+      }
+
+      dis_snapshot.timestamp = Date.now();
   }
 
 }
