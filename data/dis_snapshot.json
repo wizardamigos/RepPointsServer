@@ -2,24 +2,24 @@
     "users": [
         {
             "name": "alex",
-            "points": 86
+            "points": 88
         },
         {
             "name": "nina",
-            "points": 66
+            "points": 68
         },
         {
             "name": "alexej",
-            "points": 46
+            "points": 48
         },
         {
             "name": "kuba",
-            "points": 66
+            "points": 68
         },
         {
             "name": "jannis",
-            "points": 66
+            "points": 68
         }
     ],
-    "timestamp": 1447437491327
+    "timestamp": 1447437511334
 }
